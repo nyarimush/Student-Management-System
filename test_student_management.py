@@ -1,43 +1,49 @@
+#Ensures that the test file can access the student_management_4.py file in the same directory
+import os
+import sys
 import sqlite3
+import pytest
 
-def create_table(cursor):
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS students (
-            ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            first_name TEXT,
-            last_name TEXT,
-            course TEXT,
-            grade TEXT
-        )
-    """)
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-def insert_students(cursor, first_name, last_name, course, grade):
-    cursor.execute("""
-        INSERT INTO students (first_name, last_name, course, grade)
-        VALUES (?, ?, ?, ?)
-    """, (first_name, last_name, course, grade))
+from student_management import update_feature, delete_feature, create_table, insert_students
 
-# ONLY parameter names changed here
-def update_feature(conn, cursor, target_id, new_data):
-    cursor.execute("SELECT * FROM students WHERE ID = ?", (target_id,))
-    if cursor.fetchone() is None:
-        return False
 
-    cursor.execute("""
-        UPDATE students
-        SET first_name = ?, last_name = ?, course = ?, grade = ?
-        WHERE ID = ?
-    """, (*new_data, target_id))
-
+@pytest.fixture
+#Tests database setup and returns a connection and cursor for use in tests
+def setup_db():
+    conn = sqlite3.connect(":memory:")
+    cursor = conn.cursor()
+    create_table(cursor)
+    insert_students(cursor, "John", "Doe", "Python 101", "A")
     conn.commit()
-    return True
+    return conn, cursor
 
-# ONLY parameter names changed here
-def delete_feature(conn, cursor, target_id, confirm_delete):
-    cursor.execute("SELECT * FROM students WHERE ID = ?", (target_id,))
-    if cursor.fetchone() is None:
-        return False
+#Makes sure that update student function works 
+def test_update_student_works(setup_db):
+    conn, cursor = setup_db
+    result = update_feature(conn, cursor, target_id="1", new_data=("John", "Doe", "Python 102", "A+"))
+    
+    assert result == True
+    
+    cursor.execute("SELECT course, grade FROM students WHERE ID = 1")
+    row = cursor.fetchone()
+    assert row[0] == "Python 102"
+    assert row[1] == "A+"
 
-    cursor.execute("DELETE FROM students WHERE ID = ?", (target_id,))
-    conn.commit()
-    return True
+#tests the delete student function
+def test_delete_student_works(setup_db):
+    conn, cursor = setup_db
+    result = delete_feature(conn, cursor, target_id="1", confirm_delete=False)
+    
+    assert result == True
+    
+    cursor.execute("SELECT * FROM students WHERE ID = 1")
+    row = cursor.fetchone()
+    assert row == None
+
+#tests the update student function when the student is not found
+def test_update_student_not_found(setup_db):
+    conn, cursor = setup_db
+    result = update_feature(conn, cursor, target_id="999", new_data=("Fake", "Name", "Class", "F"))
+    assert result == False
