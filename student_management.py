@@ -26,14 +26,14 @@ def search_feature(cursor, term=None, return_data=False):
             print(f"ID: {s_id} | Name: {f_name} {l_name} | Course: {crs} | Grade: {grd}")
 
 
-def delete_feature(conn, cursor, target_ID=None, confirm_delete=True):
-    if target_ID is None:
-        target_ID = input("\nEnter Student ID to delete: ").strip()
+def delete_feature(conn, cursor, target_id=None, confirm_delete=True):
+    if target_id is None:
+        target_id = input("\nEnter Student ID to delete: ").strip()
 
-    if not str(target_ID).isdigit():
+    if not str(target_id).isdigit():
         return False
 
-    cursor.execute("SELECT * FROM students WHERE ID = ?", (target_ID,))
+    cursor.execute("SELECT * FROM students WHERE ID = ?", (target_id,))
     student = cursor.fetchone()
 
     if not student:
@@ -46,19 +46,19 @@ def delete_feature(conn, cursor, target_ID=None, confirm_delete=True):
         if confirm != "yes":
             return False
 
-    cursor.execute("DELETE FROM students WHERE ID = ?", (target_ID,))
+    cursor.execute("DELETE FROM students WHERE ID = ?", (target_id,))
     conn.commit()
     return True
 
 
-def update_feature(conn, cursor, target_ID=None, new_data=None):
-    if target_ID is None:
-        target_ID = input("\nEnter Student ID to update: ").strip()
+def update_feature(conn, cursor, target_id=None, new_data=None):
+    if target_id is None:
+        target_id = input("\nEnter Student ID to update: ").strip()
 
-    if not str(target_ID).isdigit():
+    if not str(target_id).isdigit():
         return False
 
-    cursor.execute("SELECT * FROM students WHERE ID = ?", (target_ID,))
+    cursor.execute("SELECT * FROM students WHERE ID = ?", (target_id,))
     student = cursor.fetchone()
 
     if not student:
@@ -78,7 +78,7 @@ def update_feature(conn, cursor, target_ID=None, new_data=None):
         UPDATE students
         SET first_name = ?, last_name = ?, course = ?, grade = ?
         WHERE ID = ?
-    """, (new_first, new_last, new_course, new_grade, target_ID))
+    """, (new_first, new_last, new_course, new_grade, target_id))
 
     conn.commit()
     return True
