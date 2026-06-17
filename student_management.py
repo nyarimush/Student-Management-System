@@ -1,6 +1,6 @@
 import sqlite3
 
-def Search_Feature(cursor, term=None, return_data=False):
+def search_feature(cursor, term=None, return_data=False):
     if term is None:
         term = input("\nEnter Student Name or ID to search: ").strip()
 
@@ -26,7 +26,7 @@ def Search_Feature(cursor, term=None, return_data=False):
             print(f"ID: {s_id} | Name: {f_name} {l_name} | Course: {crs} | Grade: {grd}")
 
 
-def Delete_Feature(conn, cursor, target_ID=None, confirm_delete=True):
+def delete_feature(conn, cursor, target_ID=None, confirm_delete=True):
     if target_ID is None:
         target_ID = input("\nEnter Student ID to delete: ").strip()
 
@@ -51,7 +51,7 @@ def Delete_Feature(conn, cursor, target_ID=None, confirm_delete=True):
     return True
 
 
-def Update_feature(conn, cursor, target_ID=None, new_data=None):
+def update_feature(conn, cursor, target_ID=None, new_data=None):
     if target_ID is None:
         target_ID = input("\nEnter Student ID to update: ").strip()
 
@@ -102,7 +102,7 @@ def create_table(cursor):
     """)
 
 
-def insert_studentrecords(cursor, first_name, last_name, course, grade):
+def insert_students(cursor, first_name, last_name, course, grade):
     cursor.execute(
         "INSERT INTO students (first_name, last_name, course, grade) VALUES (?, ?, ?, ?)",
         (first_name, last_name, course, grade)
@@ -147,20 +147,20 @@ def mainProgram():
             course = input("Enter course: ")
             grade = input("Enter grade: ")
 
-            insert_studentrecords(cursor, first_name, last_name, course, grade)
+            insert_students(cursor, first_name, last_name, course, grade)
             conn.commit()
 
         elif choice == "2":
             view_students(cursor)
 
         elif choice == "3":
-            Search_Feature(cursor)
+            search_feature(cursor)
 
         elif choice == "4":
-            Update_feature(conn, cursor)
+            update_feature(conn, cursor)
 
         elif choice == "5":
-            Delete_Feature(conn, cursor)
+            delete_feature(conn, cursor)
 
         elif choice == "6":
             break

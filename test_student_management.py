@@ -6,7 +6,7 @@ import pytest
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from student_management import Update_feature, Delete_Feature, create_table, insert_studentrecords
+from student_management import update_feature, delete_feature, create_table, insert_students
 
 
 @pytest.fixture
@@ -15,14 +15,14 @@ def setup_db():
     conn = sqlite3.connect(":memory:")
     cursor = conn.cursor()
     create_table(cursor)
-    insert_studentrecords(cursor, "John", "Doe", "Python 101", "A")
+    insert_students(cursor, "John", "Doe", "Python 101", "A")
     conn.commit()
     return conn, cursor
 
 #Makes sure that update student function works 
 def test_update_student_works(setup_db):
     conn, cursor = setup_db
-    result = Update_feature(conn, cursor, target_id="1", new_data=("John", "Doe", "Python 102", "A+"))
+    result = update_feature(conn, cursor, target_id="1", new_data=("John", "Doe", "Python 102", "A+"))
     
     assert result == True
     
@@ -34,7 +34,7 @@ def test_update_student_works(setup_db):
 #tests the delete student function
 def test_delete_student_works(setup_db):
     conn, cursor = setup_db
-    result = Delete_Feature(conn, cursor, target_id="1", confirm_delete=False)
+    result = delete_feature(conn, cursor, target_id="1", confirm_delete=False)
     
     assert result == True
     
@@ -45,5 +45,5 @@ def test_delete_student_works(setup_db):
 #tests the update student function when the student is not found
 def test_update_student_not_found(setup_db):
     conn, cursor = setup_db
-    result = Update_feature(conn, cursor, target_id="999", new_data=("Fake", "Name", "Class", "F"))
+    result = update_feature(conn, cursor, target_id="999", new_data=("Fake", "Name", "Class", "F"))
     assert result == False
